@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 FIGURES = Path(__file__).resolve().parents[2] / "reports" / "figures"
 ACCENT = "#2a78d6"
 INK, INK_2, SURFACE, GRID = "#0b0b0b", "#52514e", "#fcfcfb", "#e4e3df"
+# Groupes de l'arachide (capteur, site, campagne), toujours dans cet ordre et avec ces couleurs.
+GROUPS = ["150 BAZ 2015", "150 BAZ 2016", "150 CZ 2016", "120 EED 2017"]
+GROUP_COLORS = dict(zip(GROUPS, ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]))
 
 
 def apply_style():

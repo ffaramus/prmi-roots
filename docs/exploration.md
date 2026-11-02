@@ -2,9 +2,9 @@
 
 Synthèse de la phase 1 : structure du jeu PRMI, inventaire, qualité des masques par espèce,
 et choix de l'espèce de travail.
-Détails et code : [`notebooks/01_inventaire.ipynb`](../notebooks/01_inventaire.ipynb),
-[`notebooks/02_diagnostic_masques.ipynb`](../notebooks/02_diagnostic_masques.ipynb),
-[`src/prmi/`](../src/prmi/).
+Code : [`src/prmi/`](../src/prmi/). Les notebooks d'exploration de cette phase
+(`01_inventaire`, `02_diagnostic_masques`) ont été retirés du dépôt et restent dans l'historique git
+(commit `f68c3bb`).
 
 ## En bref
 
@@ -197,5 +197,6 @@ python src/prmi/inventory.py                   # data/interim/inventory.parquet 
 PYTHONPATH=src python -m prmi.diagnostic       # data/interim/mask_diagnostic.parquet (environ 1 min)
 ```
 
-Puis exécuter les notebooks `01` et `02`, qui ne lisent que ces caches (sauf pour les images
-affichées).
+Les notebooks d'origine se récupèrent avec
+`git show f68c3bb:notebooks/02_diagnostic_masques.ipynb > 02_diagnostic_masques.ipynb` ; ils ne
+lisent que ces caches (sauf pour les images affichées).
