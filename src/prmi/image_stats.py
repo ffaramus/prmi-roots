@@ -102,6 +102,25 @@ def image_stats(row, raw=RAW):
     return out
 
 
+HARD_TYPES = ["orangée", "grise", "saturée", "faible contraste", "sombre"]
+
+
+def image_type(stats):
+    """Type d'image, une seule étiquette (priorité : orangée, grise, saturée, sombre, faible contraste, sinon typique).
+
+    Seuils : R/B > 1,3 ; écart entre canaux < 5 ; plus de 5 % de pixels saturés ; 10 % les plus bas du groupe
+    en luminosité ou en écart-type (fixés sur train et val, jamais sur le test).
+    """
+    ref = stats[stats["split"] != "test"].groupby("group")
+    t = pd.Series("typique", index=stats.index)
+    t[stats["lum_std"] < stats["group"].map(ref["lum_std"].quantile(0.10))] = "faible contraste"
+    t[stats["lum_mean"] < stats["group"].map(ref["lum_mean"].quantile(0.10))] = "sombre"
+    t[stats["clip_high"] > 0.05] = "saturée"
+    t[stats["chroma"] < 5] = "grise"
+    t[stats["rb_ratio"] > 1.3] = "orangée"
+    return t
+
+
 def run_image_stats(inv=None, workers=8, batch=256):
     inv = load_inventory() if inv is None else inv
     sel = inv[inv["species"] == "Peanut"].reset_index(drop=True)
