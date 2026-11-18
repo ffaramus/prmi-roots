@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rootseg"
+version = "1.1.0"
+description = "Root Segmentator : segmentation et mesure des racines sur images de minirhizotron (arachide, PRMI)"
+requires-python = ">=3.10"
+authors = [{ name = "François Faramus" }]
+dependencies = [
+    "numpy>=2.0",
+    "scipy>=1.12",
+    "pandas>=2.2",
+    "pillow>=10.0",
+    "scikit-image>=0.24",
+    "scikit-learn>=1.8,<1.9",          # le classifieur des taches est enregistré avec scikit-learn 1.8
+    "joblib>=1.4",
+    "torch>=2.4",
+    "segmentation-models-pytorch>=0.5",
+]
+
+[project.optional-dependencies]
+api = ["fastapi>=0.115", "uvicorn>=0.30", "python-multipart>=0.0.9"]
+demo = ["streamlit>=1.40"]
+dev = ["pytest>=8", "matplotlib>=3.9", "pyarrow>=16", "tqdm>=4.66", "ipywidgets>=8"]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+packages = ["prmi"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

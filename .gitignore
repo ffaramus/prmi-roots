@@ -2,3 +2,7 @@ data/
 .venv/
 __pycache__/
 .ipynb_checkpoints/
+
+# Paquet installé en mode éditable
+*.egg-info/
+build/

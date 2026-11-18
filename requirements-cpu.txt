@@ -1,0 +1,12 @@
+# Dépendances d'exécution en version CPU (Docker, intégration continue, démo en ligne).
+# PyTorch CPU depuis l'index officiel : beaucoup plus léger que la version CUDA par défaut.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.10.0
+numpy==2.3.5
+scipy==1.17.1
+pandas==3.0.1
+pillow==12.0.0
+scikit-image==0.26.0
+scikit-learn==1.8.0
+joblib==1.5.3
+segmentation-models-pytorch==0.6.0

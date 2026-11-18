@@ -8,13 +8,12 @@ Chaîne (`preprocess_image`) :
 
 Les cartes de fond se calculent sur le split train seul (`python -m prmi.preprocess`).
 """
+from pathlib import Path
+
 import numpy as np
 from scipy import ndimage as ndi
 
-from prmi.image_stats import load_mean_images
-from prmi.inventory import ROOT
-
-FLATFIELDS = ROOT / "data" / "processed" / "flatfields.npz"
+FLATFIELDS = Path(__file__).resolve().parents[2] / "data" / "processed" / "flatfields.npz"
 
 # 120 DPI (640x480) : colonnes 0 à 15 blanches, 16 à 18 noires ; lignes 0 à 3 blanches, 472 à 479 noires.
 # Les colonnes 19 à 23 sont aussi retirées : trop sombres, bruitées et teintées après correction du fond.
@@ -70,6 +69,7 @@ def preprocess_mask(mask, dpi):
 
 def save_flatfields(path=FLATFIELDS):
     """Cartes de fond par groupe, à partir des images moyennes du train."""
+    from prmi.image_stats import load_mean_images      # outils d'exploration : inutiles à l'inférence
     maps = {g: flatfield(m, crop_for(int(g.split()[0]))).astype(np.float32) for g, m in load_mean_images().items()}
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, **maps)
