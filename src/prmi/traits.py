@@ -62,7 +62,8 @@ def _trace(skel, start, junction, max_len):
 
 def prune(skel, min_branch):
     """Retire les branches terminales de moins de `min_branch` px qui partent d'un carrefour (branches parasites). Un
-    morceau isolé, sans carrefour, est gardé quelle que soit sa longueur."""
+    morceau isolé, sans carrefour, est gardé quelle que soit sa longueur. Le pixel de la branche qui touche le carrefour
+    peut rester (connexité en diagonale) : 1 px au plus par branche."""
     s = skel.astype(bool).copy()
     if min_branch <= 0 or not s.any():
         return s

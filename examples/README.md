@@ -6,7 +6,7 @@ Root Segmentator sans télécharger le jeu complet :
 | Image | Cas |
 |---|---|
 | `Peanut_T019_L083_2016.06.13_130232_BAZ_DPI150.jpg` | racines denses |
-| `Peanut_T019_L101_2015.07.06_110520_BAZ_DPI150.jpg` | racines fines, peu nombreuses |
+| `Peanut_T019_L046_2015.06.04_104607_BAZ_DPI150.jpg` | racines fines |
 | `Peanut_T019_L077_2016.07.25_170233_BAZ_DPI150.jpg` | image sombre |
 | `Peanut_T018_L064_2015.06.04_104218_BAZ_DPI150.jpg` | sans racine |
 | `Peanut_T026_L049_2017.07.27_123345_EED_DPI120.jpg` | autre caméra (« 120 DPI ») |
