@@ -352,11 +352,11 @@ def plot_false_detections(blobs, colors=TEST_COLORS):
     return fig
 
 
-def plot_traits(tables, colors=TEST_COLORS):
+def plot_traits(tables, colors=TEST_COLORS, unit="px"):
     """Longueur et diamètre moyen par image, prédits contre référence (`prmi.train.traits`), échelles log. Le premier
     jeu (petit, référence corrigée) est tracé par-dessus, en gros points."""
     fig, axes = plt.subplots(1, 2, figsize=(13, 5.6))
-    panels = [("longueur", "Longueur (px de squelette)"), ("diamètre", "Diamètre moyen (px)")]
+    panels = [("longueur", f"Longueur ({unit})"), ("diamètre", f"Diamètre moyen ({unit})")]
     order = list(tables.items())[1:] + list(tables.items())[:1]
     color_of = dict(zip(tables, colors))
     for ax, (k, label) in zip(axes, panels):
@@ -372,9 +372,10 @@ def plot_traits(tables, colors=TEST_COLORS):
         ax.plot([lo, hi], [lo, hi], color=INK_2, ls=":", lw=1)
         ax.set(xscale="log", yscale="log", xlim=(lo, hi), ylim=(lo, hi), xlabel=f"{label} : référence",
                ylabel=f"{label} : prédiction")
-        ticks = [t for t in (2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000) if lo <= t <= hi]
-        ax.set_xticks(ticks, [f"{t:,}".replace(",", " ") for t in ticks])
-        ax.set_yticks(ticks, [f"{t:,}".replace(",", " ") for t in ticks])
+        ticks = [t for t in (0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000) if lo <= t <= hi]
+        fmt = lambda t: f"{t:g}".replace(".", ",") if t < 1000 else f"{t:,}".replace(",", " ")
+        ax.set_xticks(ticks, [fmt(t) for t in ticks])
+        ax.set_yticks(ticks, [fmt(t) for t in ticks])
         ax.minorticks_off()
         ax.set_title(f"{label} par image (sur la diagonale : exact)", loc="left", fontsize=10)
     handles, labels = axes[0].get_legend_handles_labels()
@@ -539,4 +540,64 @@ def plot_compare_sets(results, metrics, ncols=3, colors=(INK_2, ACCENT)):
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper right", ncol=len(options), frameon=False, fontsize=10)
     fig.tight_layout(rect=(0, 0, 1, 0.95))
+    return fig
+
+
+def plot_overlap(shifts, expected):
+    """Test d'échelle : meilleur décalage entre masques de positions consécutives (bleu) et de paires au hasard
+    (gris). Si les images se recouvraient, les paires consécutives se regrouperaient autour du décalage attendu
+    (`expected`, px, zone rouge)."""
+    fig, ax = plt.subplots(figsize=(6.4, 5.6))
+    ax.axhspan(expected - 15, expected + 15, color=FALSE_COLOR, alpha=0.12, lw=0)
+    ax.axhspan(-expected - 15, -expected + 15, color=FALSE_COLOR, alpha=0.12, lw=0,
+               label=f"décalage attendu à 5,9 px/mm (± {expected} px)")
+    for name, c in (("au hasard", INK_2), ("consécutives", ACCENT)):
+        s = shifts[shifts["paires"] == name]
+        ax.plot(s["dx"], s["dy"], "o", ms=5, color=c, alpha=0.6, mec="none", label=f"paires {name} ({len(s)})")
+    ax.set(xlim=(-736, 736), ylim=(-552, 552), xlabel="Décalage horizontal (px)", ylabel="Décalage vertical (px)")
+    ax.set_title("Meilleur recalage entre deux masques", loc="left", fontsize=10)
+    ax.legend(frameon=False, fontsize=8, loc="lower left")
+    fig.tight_layout()
+    return fig
+
+
+def plot_scale(diameters):
+    """Diamètre des racines (mm) selon l'échelle supposée : {libellé : diamètres en mm}, une boîte par cas."""
+    fig, ax = plt.subplots(figsize=(8.5, 3.2 + 0.25 * len(diameters)))
+    labels = list(diameters)
+    ax.boxplot([diameters[k] for k in labels], vert=False, tick_labels=labels, widths=0.5, showfliers=False,
+               patch_artist=True, boxprops=dict(facecolor=ACCENT, edgecolor=ACCENT, alpha=0.35),
+               medianprops=dict(color=ACCENT, linewidth=2), whiskerprops=dict(color=INK_2), capprops=dict(color=INK_2))
+    for y, k in enumerate(labels, start=1):
+        m = float(np.median(diameters[k]))
+        ax.annotate(f"{m:.2f} mm".replace(".", ","), (m, y), xytext=(0, 14), textcoords="offset points", ha="center",
+                    fontsize=9, color=INK)
+    ax.set_xscale("log")
+    ax.set_xlabel("Diamètre des racines (mm, échelle log)")
+    ax.set_title("Diamètre des racines annotées selon l'échelle supposée", loc="left", fontsize=10)
+    ax.grid(axis="y", visible=False)
+    fig.tight_layout()
+    return fig
+
+
+def plot_measure(image, mask, skel, dist, ppm, title):
+    """Illustration de la mesure : image, masque et squelette, largeur le long du squelette (mm)."""
+    fig, axes = plt.subplots(1, 3, figsize=(18, 4.8))
+    img = (np.clip(image, 0, 1) * 255).astype("uint8") if image.dtype != np.uint8 else image
+    axes[0].imshow(img)
+    axes[0].set_title("Image", loc="left", fontsize=10)
+    shown = overlay_mask(img, mask, alpha=0.35)
+    shown[skel] = (255, 255, 255)
+    axes[1].imshow(shown)
+    axes[1].set_title("Masque prédit et squelette (longueur)", loc="left", fontsize=10)
+    w = np.where(skel, (2 * dist - 1) / ppm, np.nan)
+    axes[2].imshow(img // 3)
+    ys, xs = np.nonzero(skel)
+    sc = axes[2].scatter(xs, ys, c=w[ys, xs], s=2, cmap="viridis")
+    fig.colorbar(sc, ax=axes[2], fraction=0.035, pad=0.02, label="diamètre local (mm)")
+    axes[2].set_title("Diamètre local le long du squelette", loc="left", fontsize=10)
+    for ax in axes:
+        ax.axis("off")
+    fig.suptitle(title, x=0.01, ha="left", fontsize=11)
+    fig.tight_layout()
     return fig

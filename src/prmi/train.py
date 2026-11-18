@@ -311,11 +311,13 @@ def run_exists(name):
 
 
 def load_run(name):
-    """Relit un entraînement, terminé ou interrompu. Renvoie le modèle, l'historique, la meilleure époque et le tableau du val."""
+    """Relit un entraînement, terminé ou interrompu. Renvoie le modèle (en mode évaluation), l'historique, la meilleure
+    époque et le tableau du val."""
     out = RUNS_DIR / name
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model = build_model(weights=None).to(device)
     model.load_state_dict(torch.load(out / "best.pt", map_location=device))
+    model.eval()                    # mode évaluation : normalisation par lots figée (prédiction image par image)
     history = pd.read_csv(out / "history.csv")
     metric = "global_dice" if "global_dice" in history else "dice"      # essais antérieurs : arrêt sur le Dice par image
     best_epoch = int(history.loc[history[metric].idxmax(), "epoch"])
@@ -401,6 +403,22 @@ def prediction_loader(name, rows, lot, filled=True):
         it = load_extra(by_name.loc[[image_name]].reset_index(), 1, filled=filled)[0]
         pred = np.asarray(Image.open(PRED_DIR / name / lot / f"PRED_{image_name}.png")) > 127
         return it["image"], it["mask_full"], pred
+
+    return get
+
+
+def v11_loader(model, clf, tau, rows, scale=2):
+    """Pour parcourir un grand jeu avec la version 1.1 (U-Net + classifieur des taches) : fonction nom -> (image
+    prétraitée, référence, prédiction), à la résolution d'origine. La prédiction est recalculée à la demande (rien
+    n'est stocké)."""
+    from prmi.blob_classifier import classifier_filter
+    by_name = rows.set_index("name")
+
+    @torch.no_grad()
+    def get(image_name):
+        it = load_extra(by_name.loc[[image_name]].reset_index(), scale)[0]
+        prob = torch.sigmoid(full_logits(model, it, next(model.parameters()).device)[0])[0, 0].cpu().numpy()
+        return preprocess_full(it), it["mask_full"], classifier_filter(prob, clf, tau)
 
     return get
 
