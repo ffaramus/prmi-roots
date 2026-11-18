@@ -79,8 +79,9 @@ class RootSegmentator:
         logits = F.interpolate(logits, size=image.shape[:2], mode="bilinear", align_corners=False)
         return torch.sigmoid(logits)[0, 0].cpu().numpy(), image
 
-    def analyze(self, rgb, name="image", px_per_mm=None):
-        """Analyse une image RGB (uint8, taille d'origine du capteur). Renvoie un `Result`."""
+    def analyze(self, rgb, name="image", px_per_mm=None, use_classifier=None):
+        """Analyse une image RGB (uint8, taille d'origine du capteur). Renvoie un `Result`. use_classifier : None =
+        réglage de l'objet."""
         rgb = np.asarray(rgb)[..., :3]
         dpi = SENSORS.get(rgb.shape[:2])
         if dpi is None:
@@ -88,7 +89,8 @@ class RootSegmentator:
                              "ou 640 x 480, images PRMI d'arachide)")
         prob, image = self.probability(rgb, dpi)
         raw = prob > 0.5
-        mask = classifier_filter(prob, self.clf, self.tau) if self.use_classifier else raw
+        keep = self.use_classifier if use_classifier is None else use_classifier
+        mask = classifier_filter(prob, self.clf, self.tau) if keep else raw
         ppm = px_per_mm or traits.px_per_mm(dpi)
         m = traits.measure(mask)
         area_cm2 = mask.size / ppm ** 2 / 100
