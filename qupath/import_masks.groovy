@@ -24,12 +24,13 @@ import java.awt.image.BufferedImage
 import javafx.application.Platform
 
 // ===================== CONFIG =====================
-def lotDir = new File('/home/francois/Bureau/e-portfolio/prmi-roots/data/interim/qupath/val')   // train, val ou test
+def lotDir = new File('/home/francois/Bureau/e-portfolio/prmi-roots/data/interim/qupath/test')   // train, val ou test
 // ==================================================
 
 def racine = PathClass.fromString('Racine', ColorTools.packRGB(30, 100, 255))   // bleu des superpositions du projet
 
 // --- Images du lot (dossiers contenant image.jpg) ---
+if (!lotDir.isDirectory()) { print("Dossier absent : " + lotDir + " (lancer d'abord l'export Python : prmi.qupath_io)"); return }
 def imageDirs = []
 lotDir.eachDir { d -> if (new File(d, 'image.jpg').exists()) imageDirs << d }
 imageDirs.sort { it.name }
@@ -56,7 +57,8 @@ def project = Projects.createProject(projectDir, BufferedImage.class)
 project.setPathClasses([racine])
 
 // --- Masque -> une annotation par morceau de racine ---
-def maskToAnnotations = { File maskFile ->
+def maskToAnnotations = { File maskFile, PathClass pathClass ->
+    if (!maskFile.exists()) return []
     def imp = IJ.openImage(maskFile.getPath())
     def cp = imp.getProcessor()
     int w = imp.getWidth(), h = imp.getHeight()
@@ -69,7 +71,7 @@ def maskToAnnotations = { File maskFile ->
     bp.setThreshold(127, 255, ij.process.ImageProcessor.NO_LUT_UPDATE)
     def ijRoi = new ij.plugin.filter.ThresholdToSelection().convert(bp)
     def roi = IJTools.convertToROI(ijRoi, 0.0, 0.0, 1.0, ImagePlane.getDefaultPlane())
-    return RoiTools.splitROI(roi).collect { PathObjects.createAnnotationObject(it, racine) }
+    return RoiTools.splitROI(roi).collect { PathObjects.createAnnotationObject(it, pathClass) }
 }
 
 // --- Ajout des images et des annotations ---
@@ -81,7 +83,7 @@ imageDirs.each { dir ->
     def imageData = entry.readImageData()
     imageData.setImageType(ImageData.ImageType.OTHER)
 
-    def anns = maskToAnnotations(new File(dir, 'mask.png'))
+    def anns = maskToAnnotations(new File(dir, 'mask.png'), racine)
     if (!anns.isEmpty()) { imageData.getHierarchy().addObjects(anns); total += anns.size() }
 
     entry.setImageName(dir.name)
