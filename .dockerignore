@@ -1,0 +1,8 @@
+# Seuls requirements-cpu.txt, pyproject.toml, src/ et examples/ entrent dans l'image.
+*
+!requirements-cpu.txt
+!pyproject.toml
+!src/
+!examples/
+**/__pycache__
+**/*.egg-info

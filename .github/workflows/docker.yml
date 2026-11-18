@@ -1,0 +1,54 @@
+name: docker
+
+# Construit l'image de l'API, vérifie qu'elle répond, puis la publie sur ghcr.io/<propriétaire>/rootseg.
+on:
+  push:
+    branches: [main]
+    paths: [Dockerfile, .dockerignore, requirements-cpu.txt, pyproject.toml, "src/**", .github/workflows/docker.yml]
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      IMAGE: ghcr.io/${{ github.repository_owner }}/rootseg
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Construction
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: rootseg:test
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Vérification (l'API répond et analyse une image d'exemple)
+        run: |
+          docker run -d --name api -p 8000:8000 rootseg:test
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break; sleep 2; done
+          curl -sf -F "image=@examples/images/Peanut_T019_L083_2016.06.13_130232_BAZ_DPI150.jpg" localhost:8000/predict \
+            | python3 -c "import json, sys; m = json.load(sys.stdin)['mesures']; assert m['racine'] and m['longueur_mm'] > 10; print(m)"
+          docker logs api
+          docker rm -f api
+
+      - name: Connexion au registre GitHub
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publication
+        run: |
+          docker tag rootseg:test $IMAGE:sha-${GITHUB_SHA::7}
+          docker push $IMAGE:sha-${GITHUB_SHA::7}
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then docker tag rootseg:test $IMAGE:latest && docker push $IMAGE:latest; fi
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then docker tag rootseg:test $IMAGE:${GITHUB_REF#refs/tags/} && docker push $IMAGE:${GITHUB_REF#refs/tags/}; fi
