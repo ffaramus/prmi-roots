@@ -3,6 +3,10 @@
 [![tests](https://github.com/ffaramus/prmi-roots/actions/workflows/tests.yml/badge.svg)](https://github.com/ffaramus/prmi-roots/actions/workflows/tests.yml)
 [![docker](https://github.com/ffaramus/prmi-roots/actions/workflows/docker.yml/badge.svg)](https://github.com/ffaramus/prmi-roots/actions/workflows/docker.yml)
 
+> **In English.** Root Segmentator detects plant roots in minirhizotron images (peanut, public PRMI dataset) and
+> measures their length, diameter and root length intensity in millimetres, per image and per tube, date and depth.
+> Command line tool, REST API, Docker image and online demo; evaluated once on unseen tubes (median Dice 0.74 to 0.79).
+
 **Mesurer les racines sur des images de minirhizotron, automatiquement et en millimètres.** Un minirhizotron photographie
 les racines contre la paroi d'un tube enfoncé dans le sol, des milliers d'images par saison ; les annoter à la main
 prend des semaines. Root Segmentator repère les racines sur chaque image et en donne la longueur, le diamètre et
@@ -27,8 +31,11 @@ démo gratuite met environ une minute à se réveiller).
   non détectées) ; diamètre juste à quelques % près au-dessus de 0,25 mm, surestimé pour les racines plus fines.
 - **Vitesse** : environ 360 images par minute sur le processeur d'un ordinateur portable, sans GPU, lecture et écriture
   comprises.
-- **Positionnement** : du même ordre que la moyenne publiée sur ces images (Dice de 0,77, Smith et al., *Plant Methods*,
-  2026), sans être directement comparable (références et définitions différentes).
+- **Positionnement** : du même ordre que le Dice moyen de 0,773 publié sur ce même jeu (arachide PRMI, mêmes découpages
+  de 11 485, 3 347 et 4 793 images), moyenne des modèles comparés dans Smith et al., *A systematic comparison of
+  transformers and ConvNets for root segmentation across nine datasets*, Plant Methods 22, 52 (2026),
+  [doi:10.1186/s13007-026-01533-6](https://doi.org/10.1186/s13007-026-01533-6), tables 4 et 5. Pas directement
+  comparable : leur référence est l'annotation d'origine et la façon de moyenner le Dice n'est pas la même.
 
 ## Utilisation
 
