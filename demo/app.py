@@ -22,7 +22,7 @@ EXAMPLE_NAMES = {"Racines denses": "Peanut_T019_L083_2016.06.13_130232_BAZ_DPI15
                  "Image sombre": "Peanut_T019_L077_2016.07.25_170233_BAZ_DPI150.jpg",
                  "Autre caméra (120 DPI)": "Peanut_T026_L049_2017.07.27_123345_EED_DPI120.jpg",
                  "Sans racine": "Peanut_T018_L064_2015.06.04_104218_BAZ_DPI150.jpg"}
-REPO = "https://github.com/ffaramus/prmi-roots"
+REPO = "https://github.com/ffaramus/rootseg"
 LABELS = {"longueur_mm": "Longueur (mm)", "diametre_moyen_mm": "Diamètre moyen (mm)",
           "intensite_mm_cm2": "Intensité racinaire (mm/cm²)", "taches_retirees": "Fausses détections retirées"}
 

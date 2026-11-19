@@ -17,7 +17,7 @@ isolée prises pour exactes (la précision est meilleure sur des totaux).
 | Entrée | image RGB prétraitée (recadrage, correction du vignettage, normalisation), réduite de moitié |
 | Post-traitement | classifieur des taches prédites (gradient boosting, 13 descripteurs de taille, probabilité, forme et contexte) qui retire les fausses détections ; seuil 0,24 |
 | Mesures | longueur du squelette, diamètre (deux fois la distance au bord le long du squelette), échelle 40,9 px/mm (736 x 552 px) ou 35,6 px/mm (640 x 480 px) |
-| Fichiers | [release v1.1](https://github.com/ffaramus/prmi-roots/releases/tag/v1.1) (U-Net, classifieur, cartes de fond), empreintes vérifiées au téléchargement |
+| Fichiers | [release v1.1](https://github.com/ffaramus/rootseg/releases/tag/v1.1) (U-Net, classifieur, cartes de fond), empreintes vérifiées au téléchargement |
 
 ## Données d'entraînement
 

@@ -1,7 +1,7 @@
 # Root Segmentator
 
-[![tests](https://github.com/ffaramus/prmi-roots/actions/workflows/tests.yml/badge.svg)](https://github.com/ffaramus/prmi-roots/actions/workflows/tests.yml)
-[![docker](https://github.com/ffaramus/prmi-roots/actions/workflows/docker.yml/badge.svg)](https://github.com/ffaramus/prmi-roots/actions/workflows/docker.yml)
+[![tests](https://github.com/ffaramus/rootseg/actions/workflows/tests.yml/badge.svg)](https://github.com/ffaramus/rootseg/actions/workflows/tests.yml)
+[![docker](https://github.com/ffaramus/rootseg/actions/workflows/docker.yml/badge.svg)](https://github.com/ffaramus/rootseg/actions/workflows/docker.yml)
 
 > **In English.** Root Segmentator detects plant roots in minirhizotron images (peanut, public PRMI dataset) and
 > measures their length, diameter and root length intensity in millimetres, per image and per tube, date and depth.
@@ -46,7 +46,7 @@ rootseg examples/images resultats/       # masques, superpositions, mesures_imag
 ```
 
 Les fichiers du modèle (20 Mo) se téléchargent au premier lancement depuis la
-[release v1.1](https://github.com/ffaramus/prmi-roots/releases/tag/v1.1).
+[release v1.1](https://github.com/ffaramus/rootseg/releases/tag/v1.1).
 
 **API web** : `rootseg-api`, puis la documentation interactive sur http://localhost:8000/docs (`/predict` : une image
 en entrée, les mesures en JSON en sortie).

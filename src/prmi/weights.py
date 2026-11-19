@@ -16,7 +16,7 @@ import urllib.request
 from pathlib import Path
 
 VERSION = "v1.1"
-REPO = "ffaramus/prmi-roots"
+REPO = "ffaramus/rootseg"
 FILES = {"unet": "rootseg-unet.pt", "classifier": "rootseg-classifier.joblib", "flatfields": "rootseg-flatfields.npz"}
 SHA256 = {             # empreintes des fichiers publiés (sortie de `python -m prmi.weights`)
     "unet": "49b4dcb72f9be433ca9b39948ba75ff61ab5030b726191c74878fc9320c0a6f5",
